@@ -1,43 +1,60 @@
 ﻿<Window x:Class="WPFApp.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Manager Financiar"
-        Height="450" Width="650"
+        Title="Manager Venituri - Cheltuieli"
+        Height="500" Width="650"
         Background="#1E1E2F">
 
     <Grid Margin="20">
 
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <TextBlock Text="Manager Venituri - Cheltuieli"
+        <!-- TITLU -->
+        <TextBlock Text="Adaugare tranzactie"
                    FontSize="24"
                    FontWeight="Bold"
                    Foreground="White"
                    HorizontalAlignment="Center"
                    Margin="0 0 0 20"/>
 
-        <StackPanel Grid.Row="1">
+        <!-- FORMULAR -->
+        <StackPanel Grid.Row="1" Width="300" HorizontalAlignment="Center">
 
-            <Border Background="#2E2E40" Padding="10" CornerRadius="10" Margin="0 0 0 10">
-                <TextBlock x:Name="txtPersoana"
-                           Foreground="White"
-                           FontSize="16"/>
-            </Border>
+            <TextBlock x:Name="lblTip" Text="Tip tranzactie:" Foreground="White"/>
+            <ComboBox x:Name="cmbTip" Margin="0 5 0 15">
+                <ComboBoxItem Content="Venit"/>
+                <ComboBoxItem Content="Cheltuiala"/>
+            </ComboBox>
 
-            <ListBox x:Name="listaTranzactii"
-                     Background="#2E2E40"
-                     BorderThickness="0"
-                     Height="200"/>
+            <TextBlock x:Name="lblDescriere" Text="Descriere:" Foreground="White"/>
+            <TextBox x:Name="txtDescriere" Margin="0 5 0 15" Height="25"/>
 
-            <TextBlock x:Name="txtTotal"
-                       Foreground="LightGreen"
-                       FontSize="16"
-                       Margin="0 10 0 0"/>
+            <TextBlock x:Name="lblSuma" Text="Suma:" Foreground="White"/>
+            <TextBox x:Name="txtSuma" Margin="0 5 0 15" Height="25"/>
+
+            <Button Content="Adauga tranzactie"
+                    Height="35"
+                    Click="BtnAdauga_Click"
+                    Margin="0 10 0 20"/>
+
+            <TextBlock x:Name="txtEroare"
+                       Foreground="Red"
+                       FontWeight="Bold"
+                       TextAlignment="Center"/>
 
         </StackPanel>
+
+        <!-- AFISARE TEXT -->
+        <TextBlock x:Name="txtAfisare"
+                   Grid.Row="2"
+                   Foreground="LightGreen"
+                   FontSize="14"
+                   TextWrapping="Wrap"
+                   Margin="0 20 0 0"/>
 
     </Grid>
 </Window>

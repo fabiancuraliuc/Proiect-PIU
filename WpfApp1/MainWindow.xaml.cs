@@ -1,76 +1,80 @@
 ﻿using LibrariiModele;
-using StocareTranzactie;
-using System.IO;
+using System.Collections.Generic;
 using System.Windows;
+using System.Windows.Media;
 
 namespace WPFApp
 {
     public partial class MainWindow : Window
     {
-        object stocare;
-        bool fisier = true;
+        List<Tranzactie> tranzactii = new List<Tranzactie>();
+
+        const double SUMA_MIN = 1;
+        const double SUMA_MAX = 100000;
 
         public MainWindow()
         {
             InitializeComponent();
-
-            string configPath = "config.txt";
-
-            if (!File.Exists(configPath))
-                File.WriteAllText(configPath, "tip=fisier");
-
-            string config = File.ReadAllText(configPath);
-
-            if (config.Contains("memorie"))
-            {
-                stocare = new StocareMemorie();
-                fisier = false;
-            }
-            else
-            {
-                stocare = new StocareFisier();
-            }
-
-            Persoana p = new Persoana
-            {
-                Nume = "Popescu",
-                Prenume = "Ion",
-                Varsta = 21
-            };
-
-            txtPersoana.Text = p.Info;
-
-            AdaugaTest();
-            Afiseaza();
         }
 
-        void AdaugaTest()
+        private void BtnAdauga_Click(object sender, RoutedEventArgs e)
         {
-            var t = new Tranzactie
+            bool valid = true;
+            txtEroare.Text = "";
+            ResetCulori();
+
+            if (cmbTip.SelectedItem == null)
             {
-                Tip = TipTranzactie.Venit,
-                Descriere = "Salariu",
-                Suma = 3000
+                lblTip.Foreground = Brushes.Red;
+                valid = false;
+            }
+
+            if (string.IsNullOrWhiteSpace(txtDescriere.Text))
+            {
+                lblDescriere.Foreground = Brushes.Red;
+                valid = false;
+            }
+
+            double suma;
+            if (!double.TryParse(txtSuma.Text, out suma) || suma < SUMA_MIN || suma > SUMA_MAX)
+            {
+                lblSuma.Foreground = Brushes.Red;
+                valid = false;
+            }
+
+            if (!valid)
+            {
+                txtEroare.Text = "Date invalide! Verifica campurile.";
+                return;
+            }
+
+            TipTranzactie tip = cmbTip.SelectedIndex == 0
+                ? TipTranzactie.Venit
+                : TipTranzactie.Cheltuiala;
+
+            Tranzactie t = new Tranzactie
+            {
+                Tip = tip,
+                Descriere = txtDescriere.Text,
+                Suma = suma
             };
 
-            if (fisier)
-                ((StocareFisier)stocare).Adauga(t);
-            else
-                ((StocareMemorie)stocare).Adauga(t);
+            tranzactii.Add(t);
+
+            txtAfisare.Text += $"Tranzactie inregistrata: {t.Tip} - {t.Descriere} - {t.Suma} lei\n";
+
+           
+
+            txtDescriere.Clear();
+            txtSuma.Clear();
+            cmbTip.SelectedIndex = -1;
         }
 
-        void Afiseaza()
+        void ResetCulori()
         {
-            if (fisier)
-            {
-                listaTranzactii.ItemsSource = ((StocareFisier)stocare).GetAll();
-                txtTotal.Text = "Total: " + ((StocareFisier)stocare).TotalVenit();
-            }
-            else
-            {
-                listaTranzactii.ItemsSource = ((StocareMemorie)stocare).GetAll();
-                txtTotal.Text = "Total: " + ((StocareMemorie)stocare).TotalVenit();
-            }
+            lblTip.Foreground = Brushes.White;
+            lblDescriere.Foreground = Brushes.White;
+            lblSuma.Foreground = Brushes.White;
         }
     }
 }
