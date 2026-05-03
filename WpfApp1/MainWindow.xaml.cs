@@ -1,16 +1,13 @@
 ﻿using LibrariiModele;
 using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
+using System.Windows.Controls; // Adăugat pentru a recunoaște ComboBoxItem
 
 namespace WPFApp
 {
     public partial class MainWindow : Window
     {
         List<Tranzactie> tranzactii = new List<Tranzactie>();
-
-        const double SUMA_MIN = 1;
-        const double SUMA_MAX = 100000;
 
         public MainWindow()
         {
@@ -19,62 +16,52 @@ namespace WPFApp
 
         private void BtnAdauga_Click(object sender, RoutedEventArgs e)
         {
-            bool valid = true;
             txtEroare.Text = "";
-            ResetCulori();
 
-            if (cmbTip.SelectedItem == null)
+            if (!double.TryParse(txtSuma.Text, out double suma) || suma <= 0)
             {
-                lblTip.Foreground = Brushes.Red;
-                valid = false;
-            }
-
-            if (string.IsNullOrWhiteSpace(txtDescriere.Text))
-            {
-                lblDescriere.Foreground = Brushes.Red;
-                valid = false;
-            }
-
-            double suma;
-            if (!double.TryParse(txtSuma.Text, out suma) || suma < SUMA_MIN || suma > SUMA_MAX)
-            {
-                lblSuma.Foreground = Brushes.Red;
-                valid = false;
-            }
-
-            if (!valid)
-            {
-                txtEroare.Text = "Date invalide! Verifica campurile.";
+                txtEroare.Text = "Suma invalidă";
                 return;
             }
 
-            TipTranzactie tip = cmbTip.SelectedIndex == 0
+            if (rbVenit.IsChecked == false && rbCheltuiala.IsChecked == false)
+            {
+                txtEroare.Text = "Selectează tipul";
+                return;
+            }
+
+            TipTranzactie tip = rbVenit.IsChecked == true
                 ? TipTranzactie.Venit
                 : TipTranzactie.Cheltuiala;
 
+            // Preluăm opțiunea selectată din noul ComboBox
+            string categorie = "Nespecificat";
+            if (cmbCategorie.SelectedItem is ComboBoxItem itemSelectat)
+            {
+                categorie = itemSelectat.Content.ToString();
+            }
+
+            // Salvăm în modelul tău (am folosit 'categorie' pe post de descriere)
             Tranzactie t = new Tranzactie
             {
                 Tip = tip,
-                Descriere = txtDescriere.Text,
+                Descriere = categorie,
                 Suma = suma
             };
 
             tranzactii.Add(t);
 
-            txtAfisare.Text += $"Tranzactie inregistrata: {t.Tip} - {t.Descriere} - {t.Suma} lei\n";
+            // Afișare concisă, fără detalii inutile
+            string textAfisare = $"{tip}: {suma} lei ({categorie})";
 
-           
+            // Adăugăm direct în noul ListBox în loc de vechiul TextBlock
+            lstIstoric.Items.Add(textAfisare);
 
-            txtDescriere.Clear();
+            // Resetare formular
             txtSuma.Clear();
-            cmbTip.SelectedIndex = -1;
-        }
-
-        void ResetCulori()
-        {
-            lblTip.Foreground = Brushes.White;
-            lblDescriere.Foreground = Brushes.White;
-            lblSuma.Foreground = Brushes.White;
+            rbVenit.IsChecked = false;
+            rbCheltuiala.IsChecked = false;
+            cmbCategorie.SelectedIndex = 0; // Revine la prima categorie
         }
     }
 }
